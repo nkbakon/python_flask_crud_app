@@ -39,7 +39,7 @@ def home():
         data = cur.fetchall()
         cur.close()
 
-        return render_template('home.html', products = data, email = session['email'])
+        return render_template('home.html', products=data, email=session['email'])
     else:
         return render_template('login.html')
     

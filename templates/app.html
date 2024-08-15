@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask CRUD</title>
+    <!-- font-awesome icons -->
+    <script src="https://kit.fontawesome.com/2d49de291b.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap.min.css')}}">
+    <link rel="shortcut icon" href="{{url_for('static', filename='fav.png')}}">
+    <style>
+        .nav-link .profile-item:hover {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased d-flex flex-column min-vh-100 bg-white">
+    <div class="d-flex bg-white">
+        <div class="d-none d-md-flex flex-column col-md-2 vh-100 sticky-top text-white bg-dark border-end">
+            <div class="mx-auto py-5">
+                <ul class="list-unstyled">
+                    <a href="" class="nav-link">
+                        <li class="px-3 py-1 d-flex align-items-center gap-2 mt-4 rounded profile-item 
+                            {% if request.path == '/home' %} bg-primary border-primary {% endif %} 
+                            border-primary cursor-pointer text-white">
+                            <span class="fw-semibold">Dashboard</span>
+                        </li>
+                    </a>
+                </ul>
+            </div>
+        </div>
+        <div class="flex-grow-1 bg-white">            
+            <!-- Page Content -->
+            <main>
+                <div class="container py-4 bg-white">
+                    {% block bodycontent %}
+                    {% endblock %}
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="{{url_for('static', filename='js/jquery-3.7.1.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='js/bootstrap.min.js')}}"></script>
+{% block js %}
+{% endblock %}
+</html>
