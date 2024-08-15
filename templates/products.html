@@ -1,0 +1,158 @@
+{% extends "app.html" %}
+
+{% block bodycontent %}
+<div class="container">
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert {% if message == 'Product deleted successfully!' %} alert-danger {% else %} alert-success {% endif %} alert-dismissable" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="close">
+                                    <span aria-hidden="true"></span>
+                                </button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <h2>Product List 
+                    <button type="button" class="btn btn-primary float-end"  data-bs-toggle="modal" data-bs-target="#add">Add New Product</button>
+                </h2>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Product Name</th>
+                            <th scope="col">Category</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in products %}
+                        <tr>
+                            <th>{{row.0}}</th>
+                            <td>{{row.1}}</td>
+                            <td>
+                                {% if row.2 == 1 %}
+                                    Mobile Phone
+                                {% elif row.2 == 2 %}
+                                    Laptop
+                                {% else %}
+                                    Accessories
+                                {% endif %}
+                            </td>
+                            <td>{{row.3}}</td>
+                            <td>
+                                <a href="/update/{{row.0}}" class="btn btn-warning"  data-bs-toggle="modal" data-bs-target="#edit{{row.0}}">Edit</a>
+                                <a href="/delete/{{row.0}}" class="btn btn-danger"  onclick="return confirm('Are you sure to delete this data?')">Delete</a>
+                            </td>
+                        </tr>
+                        <!-- Edit Modal -->
+                        <div class="modal fade" id="edit{{row.0}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="exampleModalLabel">Edit Product</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form action="{{url_for('update')}}" method="POST">
+                                            <div class="modal-body">  
+                                                <input type="hidden" name="id" value="{{row.0}}">   
+                                            <div class="form-group mb-2">
+                                                <label>Enter Product Name</label>
+                                                <input type="text" name="name" value="{{row.1}}" class="form-control" placeholder="Enter Product Name" required>                    
+                                            </div>
+                                            <div class="form-group mb-2">
+                                                <label for="category" class="font-weight-bold">Select Product Category</label>                
+                                                <select name="category" class="form-control" required>
+                                                <option value="" selected disabled>Select a product category from here</option>
+                                                <option value="1" {% if row.2 == 1 %} selected {% endif %}>Mobile Phone</option>
+                                                <option value="2" {% if row.2 == 2 %} selected {% endif %}>Laptop</option>
+                                                <option value="3" {% if row.2 == 3 %} selected {% endif %}>Accessories</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group mb-2">
+                                                <label>Enter Product Price</label>
+                                                <input type="number" min="0" step="0.01" name="price" id="price" value="{{row.3}}" class="form-control" placeholder="Enter Product Price" required>                    
+                                            </div>
+                                            <div class="form-group mb-2">
+                                                <label>Enter Product Description</label>
+                                                <input type="text" name="description"  value="{{row.4}}" class="form-control" placeholder="Enter Product Description">                    
+                                            </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            <button type="submit" name="updatedata" class="btn btn-success">Update</button>                                               
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Modal -->
+<div class="modal fade" id="add" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Add New Product</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{url_for('insert')}}" method="POST">
+                    <div class="modal-body">     
+                      <div class="form-group mb-2">
+                        <label>Enter Product Name</label>
+                        <input type="text" name="name" class="form-control" placeholder="Enter Product Name" required>                    
+                      </div>
+                      <div class="form-group mb-2">
+                        <label for="category" class="font-weight-bold">Select Product Category</label>                
+                        <select name="category" class="form-control" required>
+                          <option value="" selected disabled>Select a product category from here</option>
+                          <option value="1">Mobile Phone</option>
+                          <option value="2">Laptop</option>
+                          <option value="3">Accessories</option>
+                        </select>
+                      </div>
+                      <div class="form-group mb-2">
+                        <label>Enter Product Price</label>
+                        <input type="number" min="0" step="0.01" name="price" id="price" class="form-control" placeholder="Enter Product Price" required>                    
+                      </div>
+                      <div class="form-group mb-2">
+                        <label>Enter Product Description</label>
+                        <input type="text" name="description"  class="form-control" placeholder="Enter Product Description">                    
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                      <button type="submit" name="savedata" class="btn btn-primary">Save</button>                                               
+                    </div>
+                 </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+    document.getElementById('price').addEventListener('input', function() {
+        if (this.value < 0) {
+            this.value = 0;
+        }
+    });
+</script>
+{% endblock %}

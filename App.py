@@ -30,18 +30,30 @@ def login():
         else:
             return render_template('login.html', error='Invalid email or password')
     return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
         
 @app.route('/home')
 def home():
+    if 'email' in session:
+        return render_template('home.html', email=session['email'])
+    else:
+        return redirect(url_for('login'))
+    
+@app.route('/products')
+def products():
     if 'email' in session:
         cur = mysql.connection.cursor()
         cur.execute("SELECT * from products")
         data = cur.fetchall()
         cur.close()
 
-        return render_template('home.html', products=data, email=session['email'])
+        return render_template('products.html', products=data, email=session['email'])
     else:
-        return render_template('login.html')
+        return redirect(url_for('login'))
     
 @app.route('/insert', methods = ['POST'])
 def insert():
@@ -55,7 +67,7 @@ def insert():
         cur = mysql.connection.cursor()
         cur.execute("INSERT INTO products (name, category, price, description) VALUES (%s, %s, %s, %s)", (name, category, price, description))
         mysql.connection.commit()
-        return redirect(url_for('home'))
+        return redirect(url_for('products'))
     
 @app.route('/update', methods = ['POST', 'GET'])
 def update():
@@ -74,7 +86,7 @@ def update():
         """, (name, category, price, description, id))
         flash("Product updated successfully!")
         mysql.connection.commit()
-        return redirect(url_for('home'))
+        return redirect(url_for('products'))
     
 @app.route('/delete/<string:id>', methods = ['POST', 'GET'])
 def delete(id):
@@ -82,7 +94,7 @@ def delete(id):
     cur = mysql.connection.cursor()
     cur.execute("DELETE FROM products WHERE id = %s", (id))    
     mysql.connection.commit()
-    return redirect(url_for('home'))
+    return redirect(url_for('products'))
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -20,11 +20,25 @@
         <div class="d-none d-md-flex flex-column col-md-2 vh-100 sticky-top text-white bg-dark border-end">
             <div class="mx-auto py-5">
                 <ul class="list-unstyled">
-                    <a href="" class="nav-link">
+                    <a href="{{url_for('home')}}" class="nav-link">
                         <li class="px-3 py-1 d-flex align-items-center gap-2 mt-4 rounded profile-item 
                             {% if request.path == '/home' %} bg-primary border-primary {% endif %} 
                             border-primary cursor-pointer text-white">
-                            <span class="fw-semibold">Dashboard</span>
+                            <span class="fw-semibold"><i class="fa-solid fa-house"></i> Home</span>
+                        </li>
+                    </a>
+                    <a href="{{url_for('products')}}" class="nav-link">
+                        <li class="px-3 py-1 d-flex align-items-center gap-2 mt-4 rounded profile-item 
+                            {% if request.path == '/products' %} bg-primary border-primary {% endif %} 
+                            border-primary cursor-pointer text-white">
+                            <span class="fw-semibold"><i class="fa-solid fa-box"></i> Products</span>
+                        </li>
+                    </a>
+                    <a href="{{url_for('logout')}}" class="nav-link">
+                        <li class="px-3 py-1 d-flex align-items-center gap-2 mt-4 rounded profile-item 
+                            {% if request.path == '/logout' %} bg-primary border-primary {% endif %} 
+                            border-primary cursor-pointer text-white">
+                            <span class="fw-semibold"><i class="fa-solid fa-right-from-bracket"></i> Logout</span>
                         </li>
                     </a>
                 </ul>
