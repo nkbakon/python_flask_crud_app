@@ -1,0 +1,223 @@
+{% extends "app.html" %}
+
+{% block bodycontent %}
+<div class="container">
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert {% if message == 'User deleted successfully!' %} alert-danger {% else %} alert-success {% endif %} alert-dismissable" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="close">
+                                    <span aria-hidden="true"></span>
+                                </button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <h2>Users List 
+                    <button type="button" class="btn btn-primary float-end"  data-bs-toggle="modal" data-bs-target="#add">Add New User</button>
+                </h2>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in users %}
+                        <tr>
+                            <th>{{row.0}}</th>
+                            <td>{{row.1}}</td>
+                            <td>{{row.2}}</td>
+                            <td>
+                                {% if row.4 == 1 %}
+                                    Admin
+                                {% else %}
+                                    User
+                                {% endif %}
+                            </td>                            
+                            <td>
+                                <a href="/update/{{row.0}}" class="btn btn-warning"  data-bs-toggle="modal" data-bs-target="#edit{{row.0}}">Edit</a>
+                                <a href="/user_delete/{{row.0}}" class="btn btn-danger"  onclick="return confirm('Are you sure to delete this data?')">Delete</a>
+                            </td>
+                        </tr>
+                        <!-- Edit Modal -->
+                        <div class="modal fade" id="edit{{row.0}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="exampleModalLabel">Edit Product</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form action="{{url_for('user_update')}}" method="POST">
+                                            <div class="modal-body">  
+                                                <input type="hidden" name="id" value="{{row.0}}">   
+                                            <div class="form-group mb-2">
+                                                <label>Enter Full Name</label>
+                                                <input type="text" name="name" value="{{row.1}}" class="form-control" placeholder="Enter Full Name" required>                    
+                                            </div>
+                                            <div class="form-group mb-2">
+                                                <label for="type" class="font-weight-bold">Select User Type</label>                
+                                                <select name="type" class="form-control" required>
+                                                <option value="" selected disabled>Select a user type from here</option>
+                                                <option value="1" {% if row.4 == 1 %} selected {% endif %}>Admin</option>
+                                                <option value="2" {% if row.4 == 2 %} selected {% endif %}>User</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group mb-2">
+                                                <label>Enter Email Address</label>
+                                                <input type="email" name="email" id="update_email" value="{{row.2}}" class="form-control" placeholder="Enter Email Address" required>                    
+                                            </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            <button type="submit" name="updatedata" class="btn btn-success">Update</button>                                               
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Modal -->
+<div class="modal fade" id="add" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Add New User</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{url_for('user_insert')}}" method="POST">
+                    <div class="modal-body">     
+                      <div class="form-group mb-2">
+                        <label>Enter Full Name</label>
+                        <input type="text" name="name" class="form-control" placeholder="Enter Full Name" required>                    
+                      </div>
+                      <div class="form-group mb-2">
+                        <label for="type" class="font-weight-bold">Select User Type</label>                
+                        <select name="type" class="form-control" required>
+                          <option value="" selected disabled>Select a user type from here</option>
+                          <option value="1">Admin</option>
+                          <option value="2">User</option>
+                        </select>
+                      </div>
+                      <div class="form-group mb-2">
+                        <label>Enter Email Address</label>
+                        <input type="email" name="email" id="email" class="form-control" placeholder="Enter Email Address" required>                    
+                        <p id="danger_alert1" class="text-danger mb-2"></p>  
+                      </div>
+                      <div class="form-group mb-2 position-relative">
+                        <label>Enter Password</label>
+                        <input type="password" name="password" id="addpassword" class="form-control" placeholder="Enter Password">   
+                        <button type="button" id="togglePassword" class="btn btn-link position-absolute mt-3 end-0 top-50 translate-middle-y text-secondary">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>                 
+                      </div>
+                      <div class="form-group mb-2">
+                        <label>Enter Confirm Password</label>
+                        <input type="password" name="cm_password" id="cmpassword" class="form-control" placeholder="Enter Confirm Password">   
+                        <span id='passwordcheck'></span>                 
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                      <button type="submit" name="savedata" class="passwordvalid  btn btn-primary">Save</button>                                               
+                    </div>
+                 </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+    $('#email').change(function() {
+        document.getElementById('danger_alert1').style.display = "none";
+        var email = $(this).val();
+        if (email.length >= 3){
+            $.ajax({
+                type: 'GET',
+                url: '/users/email/check',
+                data: {
+                    "email": email
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $(".passwordvalid").attr('disabled', false);
+                    } else {
+                        document.getElementById('danger_alert1').innerHTML = "Already Registered User!"
+                        document.getElementById('danger_alert1').style.display = "block";
+                        $(".passwordvalid").attr('disabled', true);
+                    }
+                },
+                error: function(data) {
+                    console.log('Something went wrong!');
+                    document.getElementById('danger_alert1').innerHTML = "Already Registered User!"
+                    document.getElementById('danger_alert1').style.display = "block";
+                    $(".passwordvalid").attr('disabled', true);
+                }
+            });
+        }
+    });
+    </script>
+    <script>
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            const passwordField = document.getElementById('addpassword');
+            const passwordIcon = this.querySelector('i');
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                passwordIcon.classList.remove('fa-eye');
+                passwordIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordField.type = 'password';
+                passwordIcon.classList.remove('fa-eye-slash');
+                passwordIcon.classList.add('fa-eye');
+            }
+        });
+    </script>
+    <script>
+        $('#addpassword, #cmpassword').on('keyup', function () { 
+        var password = $('#addpassword').val();
+        if (password.length >= 1){
+            document.getElementById('togglePassword').style.display = "block";
+        }
+        else{
+            document.getElementById('togglePassword').style.display = "none";
+        }
+        if ($('#addpassword').val() == $('#cmpassword').val()) {
+            $('#passwordcheck').html('');
+            $(".passwordvalid").attr('disabled', false);
+        }
+        else if($('#cmpassword').val() == ''){
+            $('#passwordcheck').html('');
+        }
+        else { 
+            $('#passwordcheck').html('Passwords Not Matching').css('color', 'red');
+            $(".passwordvalid").attr('disabled', true);
+        }
+        if ($('#addpassword').val() == '' && $('#cmpassword').val() == '') {
+            $('#passwordcheck').html('');
+        }  
+        });
+    </script>
+</script>
+{% endblock %}

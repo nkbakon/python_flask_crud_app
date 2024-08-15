@@ -34,6 +34,15 @@
                             <span class="fw-semibold"><i class="fa-solid fa-box"></i> Products</span>
                         </li>
                     </a>
+                    {% if session['type'] == 1 %}
+                    <a href="{{url_for('users')}}" class="nav-link">
+                        <li class="px-3 py-1 d-flex align-items-center gap-2 mt-4 rounded profile-item 
+                            {% if request.path == '/users' %} bg-primary border-primary {% endif %} 
+                            border-primary cursor-pointer text-white">
+                            <span class="fw-semibold"><i class="fa-solid fa-users"></i> Users</span>
+                        </li>
+                    </a>
+                    {% endif %}
                     <a href="{{url_for('logout')}}" class="nav-link">
                         <li class="px-3 py-1 d-flex align-items-center gap-2 mt-4 rounded profile-item 
                             {% if request.path == '/logout' %} bg-primary border-primary {% endif %} 
