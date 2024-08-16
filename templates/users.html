@@ -6,19 +6,16 @@
     <div class="container mt-4">
         <div class="row">
             <div class="col-md-12">
-                {% with messages = get_flashed_messages() %}
+                {% with messages = get_flashed_messages(with_categories=True) %}
                     {% if messages %}
-                        {% for message in messages %}
-                            <div class="alert {% if message == 'User deleted successfully!' %} alert-danger {% else %} alert-success {% endif %} alert-dismissable" role="alert">
-                                {{ message }}
-                                <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="close">
-                                    <span aria-hidden="true"></span>
-                                </button>
-                            </div>
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                            <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="close"></button>
+                        </div>
                         {% endfor %}
                     {% endif %}
                 {% endwith %}
-
                 <h2>Users List 
                     <button type="button" class="btn btn-primary float-end"  data-bs-toggle="modal" data-bs-target="#add">Add New User</button>
                 </h2>
@@ -61,7 +58,7 @@
                                     <div class="modal-body">
                                         <form action="{{url_for('user_update')}}" method="POST">
                                             <div class="modal-body">  
-                                                <input type="hidden" name="id" value="{{row.0}}">   
+                                                <input type="hidden" name="id" id="user_update_id" value="{{row.0}}">   
                                             <div class="form-group mb-2">
                                                 <label>Enter Full Name</label>
                                                 <input type="text" name="name" value="{{row.1}}" class="form-control" placeholder="Enter Full Name" required>                    
@@ -76,12 +73,13 @@
                                             </div>
                                             <div class="form-group mb-2">
                                                 <label>Enter Email Address</label>
-                                                <input type="email" name="email" id="update_email" value="{{row.2}}" class="form-control" placeholder="Enter Email Address" required>                    
+                                                <input type="email" name="email" id="update_email" value="{{row.2}}" class="form-control" placeholder="Enter Email Address" required>
+                                                <p id="danger_alert2" class="text-danger mb-2"></p>                      
                                             </div>
                                             </div>
                                             <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                            <button type="submit" name="updatedata" class="btn btn-success">Update</button>                                               
+                                            <button type="submit" name="updatedata" class="passwordvalid btn btn-success">Update</button>                                               
                                             </div>
                                         </form>
                                     </div>
@@ -173,6 +171,37 @@
                     console.log('Something went wrong!');
                     document.getElementById('danger_alert1').innerHTML = "Already Registered User!"
                     document.getElementById('danger_alert1').style.display = "block";
+                    $(".passwordvalid").attr('disabled', true);
+                }
+            });
+        }
+    });
+
+    $('#update_email').change(function() {
+        document.getElementById('danger_alert2').style.display = "none";
+        var email = $(this).val();
+        var id = $('#user_update_id').val();
+        if (email.length >= 3){
+            $.ajax({
+                type: 'GET',
+                url: '/users/email/update',
+                data: {
+                    "email": email,
+                    "id": id
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $(".passwordvalid").attr('disabled', false);
+                    } else {
+                        document.getElementById('danger_alert2').innerHTML = "Already Registered User!"
+                        document.getElementById('danger_alert2').style.display = "block";
+                        $(".passwordvalid").attr('disabled', true);
+                    }
+                },
+                error: function(data) {
+                    console.log('Something went wrong!');
+                    document.getElementById('danger_alert2').innerHTML = "Already Registered User!"
+                    document.getElementById('danger_alert2').style.display = "block";
                     $(".passwordvalid").attr('disabled', true);
                 }
             });
