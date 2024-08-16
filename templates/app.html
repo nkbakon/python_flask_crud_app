@@ -26,12 +26,19 @@
                             border-primary cursor-pointer text-white">
                             <span class="fw-semibold"><i class="fa-solid fa-house"></i> Home</span>
                         </li>
-                    </a>
+                    </a>                    
                     <a href="{{url_for('products')}}" class="nav-link">
                         <li class="px-3 py-1 d-flex align-items-center gap-2 mt-4 rounded profile-item 
                             {% if request.path == '/products' %} bg-primary border-primary {% endif %} 
                             border-primary cursor-pointer text-white">
                             <span class="fw-semibold"><i class="fa-solid fa-box"></i> Products</span>
+                        </li>
+                    </a>
+                    <a href="{{url_for('profile')}}" class="nav-link">
+                        <li class="px-3 py-1 d-flex align-items-center gap-2 mt-4 rounded profile-item 
+                            {% if request.path == '/profile' %} bg-primary border-primary {% endif %} 
+                            border-primary cursor-pointer text-white">
+                            <span class="fw-semibold"><i class="fa-regular fa-id-card"></i> Profile</span>
                         </li>
                     </a>
                     {% if session['type'] == 1 %}

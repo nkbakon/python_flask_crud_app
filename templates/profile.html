@@ -1,0 +1,117 @@
+{% extends "app.html" %}
+
+{% block bodycontent %}
+<div class="container">
+    <div class="card card-body bg-light">
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                    <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="close"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <h4 class="text-center">Profile</h4>
+        {% if email %}
+        <p class="text-center">User: {{ email }}</p>
+
+        <form action="{{url_for('profile_update')}}" method="POST">
+            <div class="modal-body w-50">     
+              <input type="text" name="id" value="{{ id }}" hidden>
+              <div class="form-group mb-2 position-relative">
+                <label>Enter Current Password</label>
+                <input type="password" name="password" id="password" class="form-control" placeholder="Enter Current Password">   
+                <button type="button" id="togglePassword1" style="display: none;" class="btn btn-link position-absolute mt-3 end-0 top-50 translate-middle-y text-secondary">
+                    <i class="fa-regular fa-eye"></i>
+                </button>                 
+              </div>
+              <div class="form-group mb-2 position-relative">
+                <label>Enter New Password</label>
+                <input type="password" name="new_password" id="addpassword" class="form-control" placeholder="Enter New Password">   
+                <button type="button" id="togglePassword" style="display: none;" class="btn btn-link position-absolute mt-3 end-0 top-50 translate-middle-y text-secondary">
+                    <i class="fa-regular fa-eye"></i>
+                </button>                 
+              </div>
+              <div class="form-group mb-2">
+                <label>Enter Confirm Password</label>
+                <input type="password" name="cm_password" id="cmpassword" class="form-control" placeholder="Enter Confirm Password">   
+                <span id='passwordcheck'></span>                 
+              </div>
+            </div>
+            <div class="modal-footer w-50">
+              <button type="submit" name="savedata" class="passwordvalid  btn btn-success">Update</button>                                               
+            </div>
+         </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            const passwordField = document.getElementById('addpassword');
+            const passwordIcon = this.querySelector('i');
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                passwordIcon.classList.remove('fa-eye');
+                passwordIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordField.type = 'password';
+                passwordIcon.classList.remove('fa-eye-slash');
+                passwordIcon.classList.add('fa-eye');
+            }
+        });
+
+        document.getElementById('togglePassword1').addEventListener('click', function () {
+            const passwordField = document.getElementById('password');
+            const passwordIcon = this.querySelector('i');
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                passwordIcon.classList.remove('fa-eye');
+                passwordIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordField.type = 'password';
+                passwordIcon.classList.remove('fa-eye-slash');
+                passwordIcon.classList.add('fa-eye');
+            }
+        });
+    </script>
+    <script>
+        $('#addpassword, #cmpassword, #password').on('keyup', function () { 
+        var password = $('#addpassword').val();        
+        if (password.length >= 1){
+            document.getElementById('togglePassword').style.display = "block";
+        }
+        else{
+            document.getElementById('togglePassword').style.display = "none";
+        }
+
+        var current_password = $('#password').val();
+        if (current_password.length >= 1){
+            document.getElementById('togglePassword1').style.display = "block";
+        }
+        else{
+            document.getElementById('togglePassword1').style.display = "none";
+        }
+        if ($('#addpassword').val() == $('#cmpassword').val()) {
+            $('#passwordcheck').html('');
+            $(".passwordvalid").attr('disabled', false);
+        }
+        else if($('#cmpassword').val() == ''){
+            $('#passwordcheck').html('');
+        }
+        else { 
+            $('#passwordcheck').html('Passwords Not Matching').css('color', 'red');
+            $(".passwordvalid").attr('disabled', true);
+        }
+        if ($('#addpassword').val() == '' && $('#cmpassword').val() == '') {
+            $('#passwordcheck').html('');
+        }  
+        });
+    </script>
+</script>
+{% endblock %}

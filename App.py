@@ -19,13 +19,14 @@ def login():
         password = request.form['password']
 
         cur = mysql.connection.cursor()
-        cur.execute("SELECT email, password, type FROM users WHERE email = %s", (email,))
+        cur.execute("SELECT email, password, type, id FROM users WHERE email = %s", (email,))
         user = cur.fetchone()
         cur.close()
 
         if user and bcrypt.checkpw(password.encode('utf-8'), user[1].encode('utf-8')):
             session['email'] = user[0] 
             session['type'] = user[2] 
+            session['id'] = user[3] 
 
             return redirect(url_for('home'))
         else:
@@ -43,6 +44,42 @@ def home():
         return render_template('home.html', email=session['email'])
     else:
         return redirect(url_for('login'))
+    
+@app.route('/profile')
+def profile():
+    if 'email' in session:
+        return render_template('profile.html', email=session['email'], id=session['id'])
+    else:
+        return redirect(url_for('login'))
+    
+@app.route('/profile/update', methods=['POST'])
+def profile_update():
+    if request.method == 'POST':
+        id = request.form['id']
+        password = request.form['password']
+
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT password FROM users WHERE id = %s", (id,))
+        user = cur.fetchone()
+        cur.close()
+
+        if user and bcrypt.checkpw(password.encode('utf-8'), user[0].encode('utf-8')):  # Corrected to user[0]
+            new_password = request.form['new_password']
+            hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
+
+            cur = mysql.connection.cursor()
+            cur.execute("""
+            UPDATE users
+            SET password=%s
+            WHERE id=%s
+            """, (hashed_password, id))
+            mysql.connection.commit()
+
+            flash("Profile updated successfully!", 'success')
+            return redirect(url_for('profile'))
+        else:
+            flash('Invalid current password', 'danger')
+            return redirect(url_for('profile'))
     
 @app.route('/products')
 def products():
