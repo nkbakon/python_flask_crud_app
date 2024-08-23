@@ -16,4 +16,21 @@ class User:
         mysql.connection.commit()
         cur.close()
 
-    # Add more methods as needed...
+    @staticmethod
+    def find_by_id(id):
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT password FROM users WHERE id = %s", (id,))
+        user = cur.fetchone()
+        cur.close()
+        return user
+    
+    @staticmethod
+    def update_password(id, hashed_password):
+        cur = mysql.connection.cursor()
+        cur.execute("""
+            UPDATE users
+            SET password=%s
+            WHERE id=%s
+        """, (hashed_password, id))
+        mysql.connection.commit()
+        cur.close()
